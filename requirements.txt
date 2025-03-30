@@ -1,8 +1,21 @@
+# Web Frameworks
+flask
 streamlit
+
+# Machine Learning & Image Processing
 tensorflow
+keras
 numpy
 pandas
-matplotlib
+opencv-python
 scikit-learn
-Pillow
-h5py
+pillow
+matplotlib
+
+# PDF & DOCX Processing (if needed)
+PyMuPDF
+python-docx
+
+# Additional Utilities
+gunicorn  # Required for production deployment
+requests
