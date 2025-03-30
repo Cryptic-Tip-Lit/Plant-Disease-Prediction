@@ -5,7 +5,8 @@ import numpy as np
 import io
 
 # Load the trained model
-model = tf.keras.models.load_model("C:/Users/Veer/Downloads/plant_disease_model.h5")
+model = tf.keras.models.load_model("plant_disease_model.h5")
+
 
 # Corrected class labels based on your dataset
 CLASS_NAMES = [
