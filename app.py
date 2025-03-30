@@ -3,10 +3,12 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import numpy as np
 import io
+import os
+import streamlit as st
+import requests
 
 # Load the trained model
 model = tf.keras.models.load_model("plant_disease_model.h5")
-
 
 # Corrected class labels based on your dataset
 CLASS_NAMES = [
@@ -69,9 +71,27 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-import os
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Render provides a PORT env variable
-    app.run(host="0.0.0.0", port=port)  # ✅ Production-safe
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
+# Streamlit Web Interface
+st.title("Plant Disease Detection")
+
+uploaded_file = st.file_uploader("Upload an image of the plant leaf", type=["jpg", "jpeg", "png"])
+
+if uploaded_file is not None:
+    st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+    st.write("Processing...")
+
+    # Send file to Flask backend for prediction
+    files = {"file": uploaded_file.getvalue()}
+    response = requests.post("http://127.0.0.1:5000/predict", files=files)
+
+    if response.status_code == 200:
+        result = response.json()
+        st.success(f"Prediction: {result['prediction']}")
+        st.write(result['report'])
+        st.markdown(f"[Buy Recommended Pesticide]({result['pesticide_link']})")
+    else:
+        st.error("Error processing the image. Please try again.")
