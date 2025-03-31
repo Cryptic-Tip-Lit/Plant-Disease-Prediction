@@ -18,7 +18,8 @@ if uploaded_file is not None:
     API_URL = "https://plant-disease-prediction-1-6nzd.onrender.com/predict"  # Replace with actual Render URL
 
     try:
-        response = requests.post("https://plant-disease-prediction-1-6nzd.onrender.com/predict", files=files)
+        response = requests.post(API_URL, files=files)
+
 
         if response.status_code == 200:
             result = response.json()
