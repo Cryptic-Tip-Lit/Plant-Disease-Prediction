@@ -15,10 +15,10 @@ if uploaded_file is not None:
     files = {"file": uploaded_file.getvalue()}
 
     # ✅ Fix: Use deployed API instead of localhost
-    API_URL = "https://plant-disease-prediction-1-6nzd.onrender.com"  # Replace with actual Render URL
+    API_URL = "https://plant-disease-prediction-1-6nzd.onrender.com/predict"  # Replace with actual Render URL
 
     try:
-        response = requests.post("https://plant-disease-prediction-1-6nzd.onrender.com", files=files)
+        response = requests.post("https://plant-disease-prediction-1-6nzd.onrender.com/predict", files=files)
 
         if response.status_code == 200:
             result = response.json()
