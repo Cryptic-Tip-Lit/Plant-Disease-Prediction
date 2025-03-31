@@ -12,9 +12,13 @@ scikit-learn
 pillow
 matplotlib
 
-# PDF & DOCX Processing (if needed)
+# PDF & DOCX Processing
+fpdf
 PyMuPDF
 python-docx
+
+# Translation
+deep-translator
 
 # Additional Utilities
 gunicorn  # Required for production deployment
