@@ -5,8 +5,13 @@ import numpy as np
 import io
 import os
 
-# Load the trained model
-model = tf.keras.models.load_model("plant_disease_model.h5")
+# Load the TFLite model and allocate tensors
+interpreter = tf.lite.Interpreter(model_path="plant_disease_model.tflite")
+interpreter.allocate_tensors()
+
+# Get input and output tensor details
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # Class labels
 CLASS_NAMES = [
@@ -48,14 +53,20 @@ def predict():
         return jsonify({"error": "Empty file"}), 400
     
     try:
-        # Load and preprocess image
+        # Load and preprocess the image
         img = image.load_img(io.BytesIO(file.read()), target_size=(128, 128))
         img_array = image.img_to_array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+        img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
 
-        # Make prediction
-        prediction = model.predict(img_array)
-        predicted_class = np.argmax(prediction, axis=1)[0]
+        # Set the input tensor
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+
+        # Run inference
+        interpreter.invoke()
+
+        # Get the output tensor
+        output_data = interpreter.get_tensor(output_details[0]['index'])
+        predicted_class = np.argmax(output_data, axis=1)[0]
         disease_name = CLASS_NAMES[predicted_class]
 
         # Get pesticide link (if disease detected)
@@ -71,5 +82,4 @@ def predict():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-
     app.run(host="0.0.0.0", port=port)
