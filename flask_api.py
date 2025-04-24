@@ -7,13 +7,14 @@ import os
 from fpdf import FPDF
 from deep_translator import GoogleTranslator
 
-# Load the TFLite model and allocate tensors
-interpreter = tf.lite.Interpreter(model_path="plant_disease_model.tflite")
-interpreter.allocate_tensors()
+from keras.models import load_model
+from download_model import download_model
 
-# Get input and output tensor details
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+# Download model from Google Drive if not present
+download_model()
+
+# Load Keras H5 model
+model = load_model("plant_disease_model.h5")
 
 # Class labels and additional details
 DISEASE_DETAILS = {
@@ -45,15 +46,10 @@ def predict():
         img_array = image.img_to_array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
 
-        # Set the input tensor
-        interpreter.set_tensor(input_details[0]['index'], img_array)
-
-        # Run inference
-        interpreter.invoke()
-
-        # Get the output tensor
-        output_data = interpreter.get_tensor(output_details[0]['index'])
+        # Run inference with Keras model
+        output_data = model.predict(img_array)
         predicted_class = np.argmax(output_data, axis=1)[0]
+
         disease_name = list(DISEASE_DETAILS.keys())[predicted_class]
 
         # Get disease details
