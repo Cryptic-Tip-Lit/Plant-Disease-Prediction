@@ -7,14 +7,14 @@ import os
 from fpdf import FPDF
 from deep_translator import GoogleTranslator
 
-from keras.models import load_model
-from download_model import download_model
+# Initialize TFLite model
+MODEL_PATH = "plant_disease_model.tflite"
 
-# Download model from Google Drive if not present
-download_model()
-
-# Load Keras H5 model
-model = load_model("plant_disease_model.h5")
+# Load TFLite model
+interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # Class labels and additional details
 DISEASE_DETAILS = {
@@ -46,16 +46,18 @@ def predict():
         img_array = image.img_to_array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
 
-        # Run inference with Keras model
-        output_data = model.predict(img_array)
-        predicted_class = np.argmax(output_data, axis=1)[0]
+        # Inference using TFLite
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()
+        output_data = interpreter.get_tensor(output_details[0]['index'])
 
+        predicted_class = int(np.argmax(output_data))
         disease_name = list(DISEASE_DETAILS.keys())[predicted_class]
 
-        # Get disease details
+        # Disease info
         details = DISEASE_DETAILS.get(disease_name, {"severity": "Unknown", "cause": "Unknown", "info": "No information available.", "pesticide": "No specific pesticide needed."})
 
-        # Generate disease report
+        # Report content
         report = f"Disease: {disease_name}\nSeverity: {details['severity']}\nCause: {details['cause']}\nInfo: {details['info']}\nRecommended Pesticide: {details['pesticide']}"
         translated_report = GoogleTranslator(source='auto', target=language).translate(report)
         
