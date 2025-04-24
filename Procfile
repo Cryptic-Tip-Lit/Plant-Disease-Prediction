@@ -1,1 +1,1 @@
-web: python -m download_model && python app.py
+web: python -m download_model && python flask_api.py
