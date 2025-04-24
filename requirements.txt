@@ -23,3 +23,5 @@ deep-translator
 # Additional Utilities
 gunicorn  # Required for production deployment
 requests
+
+gdown
