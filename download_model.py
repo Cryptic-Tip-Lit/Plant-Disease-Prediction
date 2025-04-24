@@ -1,17 +1,19 @@
 import os
-import gdown
+from google_drive_downloader import GoogleDriveDownloader as gdd
 
 def download_model():
-    file_id = "1kcMD1FWnCdtWkvgW6Qhh63kmGU1BpluV"
-    url = f"https://drive.google.com/uc?id={file_id}"
-    output = "plant_disease_model.h5"
-
-    if not os.path.exists(output):
-        print(f"Downloading model file to '{output}'...")
-        gdown.download(url, output, quiet=False)
-        print("✅ Download complete.")
+    model_path = "plant_disease_model.h5"  # Path where the model will be saved
+    
+    # Check if the model already exists
+    if not os.path.exists(model_path):
+        print("Model not found. Downloading from Google Drive...")
+        gdd.download_file_from_google_drive(
+            file_id="1kcMD1FWnCdtWkvgW6Qhh63kmGU1BpluV",  # Actual file ID from Google Drive
+            dest_path=model_path  # Path where the model file will be saved
+        )
+        print("Model downloaded successfully.")
     else:
-        print(f"✅ Model file already exists: {output}")
+        print("Model already exists. Skipping download.")
 
 if __name__ == "__main__":
     download_model()
